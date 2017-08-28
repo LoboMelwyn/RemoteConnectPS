@@ -13,5 +13,9 @@ It Uses SQLite as database to store remote IPAddress, Credentials and uses windo
 
 Troubleshooting: if the scripts are blocked kindly run **set-executionpolicy unrestricted** in Powershell at administrative mode.
 
+# Screenshot
+First Screen Image
+![Main Screen](Screenshot-1.png)
+
 # Reference
 Connect-Mstsc.ps1 was taken from https://gallery.technet.microsoft.com/scriptcenter/Connect-Mstsc-Open-RDP-2064b10b
