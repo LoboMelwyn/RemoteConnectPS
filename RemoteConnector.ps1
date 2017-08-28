@@ -1,5 +1,5 @@
 . .\Connect-Mstsc.ps1
-Import-Module .\PSSQLite
+Import-Module PSSQLite
 Add-Type -AssemblyName System.Windows.Forms
 
 function RemoteCon {
