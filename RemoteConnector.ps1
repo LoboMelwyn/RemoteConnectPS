@@ -52,7 +52,7 @@ function Add-NewConnection {
     $AddDialog.controls.Add($iplbl)
 
     $iptxt = New-Object System.Windows.Forms.TextBox
-    $iptxt.Text = "10.10.0.0"
+    $iptxt.Text = "192.168.1.1"
     $iptxt.Width = 100
     $iptxt.Height = 20
     $iptxt.location = new-object system.drawing.point(105, 38)
@@ -168,7 +168,7 @@ function Update-Connection {
     $updateDialog.controls.Add($iplbl)
 
     $iptxt = New-Object System.Windows.Forms.TextBox
-    $iptxt.Text = "10.10.0.0"
+    $iptxt.Text = "192.168.1.1"
     $iptxt.Width = 100
     $iptxt.Height = 20
     $iptxt.location = new-object system.drawing.point(105, 38)
