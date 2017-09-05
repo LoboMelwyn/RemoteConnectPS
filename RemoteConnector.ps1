@@ -52,7 +52,7 @@ function Add-NewConnection {
     $AddDialog.controls.Add($iplbl)
 
     $iptxt = New-Object System.Windows.Forms.TextBox
-    $iptxt.Text = "192.168.1.1"
+    $iptxt.Text = "10.10.0.0"
     $iptxt.Width = 100
     $iptxt.Height = 20
     $iptxt.location = new-object system.drawing.point(105, 38)
@@ -168,7 +168,7 @@ function Update-Connection {
     $updateDialog.controls.Add($iplbl)
 
     $iptxt = New-Object System.Windows.Forms.TextBox
-    $iptxt.Text = "192.168.1.1"
+    $iptxt.Text = "10.10.0.0"
     $iptxt.Width = 100
     $iptxt.Height = 20
     $iptxt.location = new-object system.drawing.point(105, 38)
@@ -224,10 +224,10 @@ function Update-Connection {
     $updateDialog.controls.Add($typetxt)
 
     $uplist = New-Object System.Windows.Forms.ListBox
-    $query = "select ipaddress from RemoteConnection;"
+    $query = "select name from RemoteConnection;"
     $results = Invoke-SqliteQuery -Query $query -DataSource $database
     foreach ($r in $results) {
-        [void] $uplist.Items.Add($r.ipaddress)
+        [void] $uplist.Items.Add($r.name)
     }
     $uplist.Width = 100
     $uplist.Height = 20
@@ -240,14 +240,14 @@ function Update-Connection {
     $OKButton.AutoSize = $true
     $OKButton.Text = "OK"
     $OKButton.Add_Click( {
-            $ipaddr = $uplist.SelectedItem
-            if ($ipaddr -ne $null) {
-                $query = "select * from RemoteConnection where ipaddress = '$ipaddr';"
+            $name = $uplist.SelectedItem
+            if ($name -ne $null) {
+                $query = "select * from RemoteConnection where name = '$name';"
                 $d = Invoke-SqliteQuery -Query $query -DataSource $database
                 $iptxt.Text = $d.ipaddress
                 $usrtxt.Text = $d.username
                 $pswdtxt.Text = $d.psswrd
-                $typetxt.SetSelected($d.type-1,$true)
+                $typetxt.SetSelected($d.type - 1, $true)
                 $nmetxt.Text = $d.name
             }
         })
@@ -280,6 +280,61 @@ function Update-Connection {
 
     [void]$updateDialog.ShowDialog();
     $updateDialog.Dispose()
+}
+
+function Delete-Connection {
+    $DelDialog = New-Object system.Windows.Forms.Form
+    $DelDialog.Text = "Delete Connection"
+    $DelDialog.MaximizeBox = $false
+    $DelDialog.MinimizeBox = $false
+    $DelDialog.Width = 300
+    $DelDialog.Height = 220
+    
+    $nmelbl = New-Object system.windows.Forms.Label
+    $nmelbl.Text = "Name"
+    $nmelbl.Width = 50
+    $nmelbl.Height = 20
+    $nmelbl.location = new-object system.drawing.point(5, 10)
+    $nmelbl.Font = "Microsoft Sans Serif,10"
+    $DelDialog.controls.Add($nmelbl)
+
+    $nmetxt = New-Object System.Windows.Forms.ListBox
+    $query = "select name from RemoteConnection;"
+    $results = Invoke-SqliteQuery -Query $query -DataSource $database
+    foreach ($r in $results) {
+        [void] $nmetxt.Items.Add($r.name)
+    }
+    $nmetxt.Width = 200
+    $nmetxt.Height = 20
+    $nmetxt.location = new-object system.drawing.point(80, 8)
+    $nmetxt.Font = "Microsoft Sans Serif,10"
+    $DelDialog.controls.Add($nmetxt)
+
+    $OKButton = New-Object System.Windows.Forms.Button
+    $OKButton.Location = New-Object System.Drawing.Size(5, 160)
+    $OKButton.AutoSize = $true
+    $OKButton.Text = "OK"
+    $OKButton.Add_Click( {
+            if ($nmetxt -ne '') {
+                $msgBoxInput = [System.Windows.Forms.MessageBox]::Show('Are you sure to delete ' + $nmetxt.Text + ' ?', 'Delete RC', 'YesNoCancel', 'Error')
+                switch ($msgBoxInput) {                
+                    'Yes' {
+                        $query = "Delete from RemoteConnection where name = '$($nmetxt.Text)';"
+                        Invoke-SqliteQuery -Query $query -DataSource $database
+                        $DelDialog.Close()
+                        $rconnect.Dispose()
+                        create-main
+                    }
+                }
+            }
+            else {
+                [System.Windows.Forms.MessageBox]::Show('Select a name')
+            }
+        })
+    $DelDialog.Controls.Add($OKButton)
+
+    [void]$DelDialog.ShowDialog();
+    $DelDialog.Dispose()
 }
 
 function create-main {
@@ -331,8 +386,19 @@ function create-main {
     $ucon.Add_Click( {
             Update-Connection
         })
-    $acon.Font = "Microsoft Sans Serif,10"
+    $ucon.Font = "Microsoft Sans Serif,10"
     $rconnect.controls.Add($ucon)
+
+    $dcon = New-Object system.windows.Forms.Button
+    $dcon.Text = "Delete a Connection"
+    $dcon.Width = 100
+    $dcon.Height = 50
+    $dcon.location = new-object system.drawing.point(270, 115)
+    $dcon.Add_Click( {
+            Delete-Connection
+        })
+    $dcon.Font = "Microsoft Sans Serif,10"
+    $rconnect.controls.Add($dcon)
 
     [void]$rconnect.ShowDialog()
     $rconnect.Dispose()
